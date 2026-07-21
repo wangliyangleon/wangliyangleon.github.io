@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liyang's Home Page</title>
+  <meta name="description" content="立洋的主页，欢迎">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- Top Status Bar -->
+  <div class="status-bar">
+    <div class="container">
+      <div class="status-left">
+        <span class="status-item"><span class="dot-indicator"></span>SYSTEM: <strong>ONLINE</strong></span>
+      </div>
+      <div class="status-right">
+        <button id="theme-toggle" class="theme-toggle-btn" title="快捷键: t">THEME: DARK</button>
+        <span class="status-item" id="system-time">12:57:00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="hero-block">
+        <div class="bio-text">
+          <h1>Hello, I'm Liyang<span class="cursor"></span></h1>
+          <p>
+            一名古法编程手艺人、vibe coding爱好者，这里有我的<a href="#projects" onclick="switchTab('projects')">作品</a> 、思考、和梦话。
+          </p>
+        </div>
+
+        <!-- Neofetch Widget -->
+        <div class="neofetch-widget">
+          <div class="neofetch-header">
+            <span class="neofetch-dot red"></span>
+            <span class="neofetch-dot yellow"></span>
+            <span class="neofetch-dot green"></span>
+            <span class="neofetch-title mono">neofetch --user me</span>
+          </div>
+          <div class="neofetch-content">
+            <div class="neofetch-ascii">
+  /\___/\
+ ( ≡.ω.≡ )
+  \__U__/
+[GEEK_SHIBA]
+            </div>
+            <div class="neofetch-info" id="neofetch-info">
+              <div class="neofetch-info-row"><span class="label">you</span>@wangliyang.me</div>
+              <div class="neofetch-info-row">-------------------</div>
+              <div class="neofetch-info-row"><span class="label">OS</span>: <span id="neo-os">macOS</span></div>
+              <div class="neofetch-info-row"><span class="label">Browser</span>: <span id="neo-browser">Safari</span></div>
+              <div class="neofetch-info-row"><span class="label">Uptime</span>: <span id="neo-uptime">0s</span></div>
+              <div class="neofetch-info-row"><span class="label">City</span>: Singapore</div>
+              <div class="neofetch-info-row"><span class="label">Coffee</span>: Long Black</div>
+              <div class="neofetch-info-row"><span class="label">Next</span>: Tokyo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navigation & Search -->
+  <main class="container" style="flex-grow: 1;">
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav" id="main-tabs">
+      <button class="tab-btn active" data-tab="projects">PROJECTS<span class="tab-key-hint">1</span></button>
+      <button class="tab-btn" data-tab="tech">TECH_BLOG<span class="tab-key-hint">2</span></button>
+      <button class="tab-btn" data-tab="writings">WRITINGS<span class="tab-key-hint">3</span></button>
+    </nav>
+
+    <!-- Search Input (Only shown for Blog & Poetry, but globally accessible via /) -->
+    <div class="search-container">
+      <input type="text" id="search-input" class="search-input" placeholder="输入关键字搜索文章/标签... (按 / 键聚焦)">
+      <span class="search-key-hint">/</span>
+    </div>
+
+    <!-- Tab Panels -->
+    <!-- Projects Pane -->
+    <div class="tab-pane active" id="projects-pane">
+      <div class="projects-grid" id="projects-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Tech Blog Pane -->
+    <div class="tab-pane" id="tech-pane">
+      <div class="post-list" id="tech-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Writings Pane -->
+    <div class="tab-pane" id="writings-pane">
+      <div class="post-list" id="writings-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </main>
+
+
+
+  <!-- Keyboard Shortcuts Helper Widget -->
+  <div class="keyboard-helper" id="keyboard-helper">
+    <div class="keyboard-helper-title">
+      <span>KEYBOARD_NAV</span>
+      <span class="keyboard-helper-key">?</span>
+    </div>
+    <div class="keyboard-helper-row">
+      <span>项目索引 Tab</span>
+      <span class="keyboard-helper-key">1</span>
+    </div>
+    <div class="keyboard-helper-row">
+      <span>技术文章 Tab</span>
+      <span class="keyboard-helper-key">2</span>
+    </div>
+    <div class="keyboard-helper-row">
+      <span>随笔文章 Tab</span>
+      <span class="keyboard-helper-key">3</span>
+    </div>
+    <div class="keyboard-helper-row">
+      <span>切换 Tab</span>
+      <span class="keyboard-helper-key">H</span> / <span class="keyboard-helper-key">L</span>
+    </div>
+    <div class="keyboard-helper-row">
+      <span>搜索过滤</span>
+      <span class="keyboard-helper-key">/</span>
+    </div>
+    <div class="keyboard-helper-row">
+      <span>切换暗/亮主题</span>
+      <span class="keyboard-helper-key">T</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/wangliyangleon">GitHub</a>
+      </div>
+      <div>© 2026 Liyang.</div>
+    </div>
+  </footer>
+
+  <script src="assets/main.js"></script>
+</body>
+</html>

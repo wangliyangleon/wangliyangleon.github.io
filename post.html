@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章 - Liyang's Blog</title>
+  <meta name="description" content="Liyang 的极客博客文章阅读页">
+  <link rel="stylesheet" href="assets/style.css">
+  <!-- Marked.js Markdown Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Status Bar -->
+  <div class="status-bar">
+    <div class="container">
+      <div class="status-left">
+        <span class="status-item"><span class="dot-indicator"></span>SYSTEM: <strong>ONLINE</strong></span>
+      </div>
+      <div class="status-right">
+        <button id="theme-toggle" class="theme-toggle-btn" title="快捷键: t">THEME: DARK</button>
+        <span class="status-item" id="system-time">12:57:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: 40px;">
+    <!-- Back Navigation -->
+    <a href="index.html" class="back-link" id="back-btn">
+      <span class="mono">&lt;- [Esc] BACK_TO_HOME</span>
+    </a>
+
+    <!-- Article Content -->
+    <article class="post-content">
+      <div class="post-header-area" id="post-header">
+        <div class="post-meta">
+          <span class="post-date" id="post-date">YYYY-MM-DD</span>
+          <span class="post-tag" id="post-tag">TAG</span>
+        </div>
+        <h1 id="post-title">加载中...</h1>
+      </div>
+
+      <!-- Rendered Body -->
+      <div class="markdown-body" id="post-body">
+        <p>正在拉取文章数据...</p>
+      </div>
+    </article>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="index.html">返回主页</a>
+        <a href="https://github.com/wangliyangleon">GitHub</a>
+      </div>
+      <div>© 2026 Liyang.</div>
+    </div>
+  </footer>
+
+  <!-- Page Logic -->
+  <script>
+    // System Time Clock
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      document.getElementById('system-time').textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Theme Manager
+    const themeBtn = document.getElementById('theme-toggle');
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('blog-theme', theme);
+      themeBtn.textContent = `THEME: ${theme.toUpperCase()}`;
+    }
+
+    const savedTheme = localStorage.getItem('blog-theme') || 
+      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    setTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Backspace') {
+        window.location.href = 'index.html';
+      }
+      if (e.key === 't' || e.key === 'T') {
+        const current = document.documentElement.getAttribute('data-theme');
+        setTheme(current === 'dark' ? 'light' : 'dark');
+      }
+    });
+
+    // Article database (JSON mockup)
+    // To match actual MD files in the posts/ directory
+    const articleDB = {};
+
+    // Load and Parse Article
+    async function loadArticle() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get('p');
+      
+      const article = articleDB[postId];
+      if (!article) {
+        document.getElementById('post-title').textContent = '404 - 文章未找到';
+        document.getElementById('post-body').innerHTML = '<p>您请求的文章不存在或已被归档。请返回 <a href="index.html">主页</a> 浏览其它文章。</p>';
+        document.getElementById('post-date').style.display = 'none';
+        document.getElementById('post-tag').style.display = 'none';
+        return;
+      }
+
+      // Update basic details
+      document.getElementById('post-title').textContent = article.title;
+      document.title = `${article.title} - Liyang's Blog`;
+      document.getElementById('post-date').textContent = article.date;
+      document.getElementById('post-tag').textContent = `[${article.tag.toUpperCase()}]`;
+
+      // Apply special layouts for poetry
+      const bodyEl = document.getElementById('post-body');
+      const headerEl = document.getElementById('post-header');
+      if (article.tag.toLowerCase() === 'poetry') {
+        bodyEl.classList.add('poetry-body');
+        headerEl.classList.add('poetry-style-header');
+      }
+
+      try {
+        const response = await fetch(`posts/${article.file}`);
+        if (!response.ok) {
+          throw new Error('网络请求错误');
+        }
+        let markdown = await response.text();
+        
+        // Remove the first H1 tag in Markdown if it exists (since we already render it in H1 #post-title)
+        markdown = markdown.replace(/^#\s+.+$/m, '');
+
+        // Configure marked options
+        marked.setOptions({
+          gfm: true,
+          breaks: true
+        });
+        
+        bodyEl.innerHTML = marked.parse(markdown);
+      } catch (err) {
+        bodyEl.innerHTML = `<p style="color:var(--accent);">加载文章 Markdown 失败: ${err.message}</p>`;
+      }
+    }
+
+    loadArticle();
+  </script>
+</body>
+</html>
