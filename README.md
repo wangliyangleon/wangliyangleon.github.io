@@ -7,16 +7,15 @@
 ## 目录结构
 
 ```text
-my_blog/
+.
 ├── index.html         # 博客主页 (Neofetch, 项目卡片, 文章与随笔列表)
 ├── post.html          # 通用文章渲染模板 (动态解析 posts/*.md)
 ├── README.md          # 维护说明文档 (本文件)
+├── CNAME              # GitHub Pages 自定义域名 (wangliyang.me)
 ├── assets/
 │   ├── style.css      # 自适应亮暗色主题、毛玻璃与微动画样式表
-│   └── main.js        # 键盘快捷键监听与 Tab 路由控制器
-└── posts/             # 存放 Markdown 博客文章与随笔
-    ├── pzt-design.md  # 示例技术博客
-    └── spring-rain.md # 示例随笔
+│   └── main.js        # 键盘快捷键监听、Tab 路由控制器与项目/文章数据
+└── posts/             # 存放 Markdown 博客文章与随笔 (目前为空，见下文说明)
 ```
 
 ## 本地预览
@@ -46,23 +45,17 @@ python3 -m http.server 8000
 
 ---
 
-## 部署到 GitHub Pages (`wangliyang.com`)
+## 部署到 GitHub Pages (`wangliyang.me`)
 
-因为原生的博客没有任何编译或构建链路，部署非常简单：
+本仓库本身就是 GitHub Pages 的部署根目录，没有任何编译或构建链路，直接推送即可上线：
 
-1. **清理旧的 Docusaurus 目录**：
-   进入你的 `wangliyangleon.github.io` 仓库本地目录，备份并删除里面所有的 Docusaurus 源文件（如 `docusaurus.config.js`、`src/`、`static/` 等），只留下 `.git` 文件夹和 `CNAME` 文件（`CNAME` 包含 `wangliyang.com` 以保持你的域名重定向）。
+```bash
+git add .
+git commit -m "更新内容"
+git push origin main
+```
 
-2. **复制新博客文件**：
-   将 `my_blog` 下的所有文件（`index.html`、`post.html`、`assets/`、`posts/`）复制到你的 GitHub 仓库根目录。
-
-3. **推送代码**：
-   ```bash
-   git add .
-   git commit -m "feat: deploy lightweight geek-style vanilla blog homepage"
-   git push origin main
-   ```
-   推送后数分钟内，GitHub Pages 就会自动上线你的新主页。
+推送后数分钟内，GitHub Pages 就会自动更新 [wangliyang.me](https://wangliyang.me)。`CNAME` 文件已包含该自定义域名，无需额外配置。
 
 ---
 
@@ -73,8 +66,8 @@ python3 -m http.server 8000
 1. **新建 Markdown 文件**：
    在 `posts/` 目录下创建一个新文件，例如 `posts/my-new-post.md`。使用标准的 Markdown 语法撰写内容，首行可以写一个 `# 你的标题`。
 
-2. **注册到主页数据库**：
-   打开 `assets/main.js` 文件，在最顶部的 `articles` 数组中，仿照已有格式添加你的文章元数据：
+2. **注册到主页列表**：
+   打开 `assets/main.js` 文件，在最顶部的 `articles` 数组中添加你的文章元数据（默认为空数组 `[]`，按下面格式追加即可）：
 
    ```javascript
    {
@@ -86,5 +79,17 @@ python3 -m http.server 8000
      summary: '文章的一句话简介...'  // 主页列表预览文案
    }
    ```
-   
-   同样，如果你在 `post.html` 中也想要实现单独打开直接刷新，也可以在 `post.html` 底部脚本的 `articleDB` 中注册对应的 ID（或者你直接引用 `assets/main.js` 的 `articles` 数组，本项目为了结构极简采用两处注册，你可以未来根据需要引入一个公共 of `db.js` 以保持 DRY 原则）。
+
+3. **注册到文章页数据库**：
+   `post.html` 通过独立的 `articleDB` 对象查找并渲染文章（同样默认为空对象 `{}`），需要在其底部脚本中补充对应条目：
+
+   ```javascript
+   'my-new-post': {
+     title: '你新文章的标题',
+     date: '2026-07-21',
+     tag: 'tech',           // 'poetry' 会触发随笔专属的排版样式
+     file: 'my-new-post.md' // posts/ 目录下的实际文件名
+   }
+   ```
+
+   本项目为了结构极简，在 `main.js` 与 `post.html` 中各维护一份数据，未来如需减少重复可以考虑抽取一个公共的 `db.js`。
