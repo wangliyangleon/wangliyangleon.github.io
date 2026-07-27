@@ -9,8 +9,10 @@ const projects = [
     language: 'C++20 & Python',
     desc: '基于终端、全键盘的图片筛选与色彩处理工具，核心诉求是零延迟选片体验与高性能本地色彩流水线。配合 Ghostty 终端的 Kitty 协议在大图模式下能无延迟秒切。',
     install: 'brew tap wangliyangleon/pzt && brew install pzt',
-    stars: '84',
-    version: '2026-07-17',
+    stars: null,
+    version: null,
+    fallbackStars: '84',
+    fallbackVersion: '2026-07-17',
     url: 'https://wangliyangleon.github.io/picztream',
     github: 'https://github.com/wangliyangleon/picztream',
     featured: true
@@ -161,8 +163,8 @@ function renderProjects() {
       </div>
       <div class="project-footer">
         <div class="project-stats">
-          <span class="project-stat-item">★ ${p.stars}</span>
-          <span class="project-stat-item">Ver: ${p.version}</span>
+          <span class="project-stat-item">★ ${p.stars !== null ? p.stars : '...'}</span>
+          <span class="project-stat-item">Ver: ${p.version !== null ? p.version : 'fetching...'}</span>
         </div>
         <div class="project-links">
           <a href="${p.url}" target="_blank" class="project-link">Home -></a>
@@ -172,6 +174,69 @@ function renderProjects() {
     `;
     projectsList.appendChild(card);
   });
+}
+
+// Fetch and update project statistics dynamically from GitHub API
+async function fetchAndUpdateProjectStats() {
+  for (const p of projects) {
+    if (!p.github) continue;
+    
+    const match = p.github.match(/github\.com\/([^/]+)\/([^/]+)/);
+    if (!match) continue;
+    
+    const owner = match[1];
+    const repo = match[2];
+    
+    let starsFetched = false;
+    let versionFetched = false;
+    
+    try {
+      // 1. Fetch Stars
+      const repoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+      if (repoRes.ok) {
+        const repoData = await repoRes.json();
+        p.stars = repoData.stargazers_count.toString();
+        starsFetched = true;
+      }
+    } catch (err) {
+      console.error(`Failed to fetch stars for ${p.id}:`, err);
+    }
+    
+    try {
+      // 2. Fetch Latest Release
+      const releaseRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`);
+      if (releaseRes.ok) {
+        const releaseData = await releaseRes.json();
+        const publishDate = new Date(releaseData.published_at);
+        const formattedDate = publishDate.toISOString().split('T')[0];
+        p.version = `${releaseData.tag_name} (${formattedDate})`;
+        versionFetched = true;
+      } else {
+        // Fallback to tags if no formal release is available
+        const tagsRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/tags`);
+        if (tagsRes.ok) {
+          const tagsData = await tagsRes.json();
+          if (tagsData.length > 0) {
+            p.version = tagsData[0].name;
+            versionFetched = true;
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`Failed to fetch version for ${p.id}:`, err);
+    }
+    
+    // Apply fallback values if fetching failed (e.g. rate limit, offline)
+    if (!starsFetched) {
+      p.stars = p.fallbackStars;
+    }
+    if (!versionFetched) {
+      p.version = p.fallbackVersion;
+    }
+    
+    // Re-render project list after updates
+    renderProjects();
+  }
 }
 
 // Render Lists (Tech & Writings)
@@ -295,6 +360,7 @@ function navigateTab(direction) {
 renderProjects();
 renderLists();
 updateNeofetch();
+fetchAndUpdateProjectStats();
 
 // Hide keyboard helper after 5 seconds
 setTimeout(() => {
